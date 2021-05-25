@@ -1,12 +1,5 @@
 const router = require('express').Router();
-const { validateNewNote, createNewNotes, deleteNote } = require('../../lib/notes.lib');
-const notesArrayFunc =(() => {
-    let { notesArray } = require('../../db/db.json');
-    return {
-        get: ()=> notesArray,
-        set: (newNotesArray) => notesArray = [...newNotesArray],
-    }
-})()
+const { validateNewNote, createNewNotes, deleteNote, notesArrayFunc } = require('../../lib/notes.lib');
 
 router.get('/notes', (req, res) => {
     const notes = notesArrayFunc.get();
