@@ -1,20 +1,32 @@
 const router = require('express').Router();
-const { notesArray } = require('../../db/db.json');
-const { validateNewNote, createNewNotes } = require('../../lib/notes.lib');
+const { validateNewNote, createNewNotes, deleteNote } = require('../../lib/notes.lib');
+const notesArrayFunc =(() => {
+    let { notesArray } = require('../../db/db.json');
+    return {
+        get: ()=> notesArray,
+        set: (newNotesArray) => notesArray = [...newNotesArray],
+    }
+})()
 
 router.get('/notes', (req, res) => {
-    let results = notesArray;
-    res.json(results);
+    const notes = notesArrayFunc.get();
+    res.json(notes);
 });
 
 router.post('/notes', (req, res) => {
-    req.body.id = notesArray.length.toString();
+    req.body.id = notesArrayFunc.get().length.toString();
     if(!validateNewNote(req.body)){
         res.status(400).send('The note you just added is not properly formatted.');
     } else {
-        const note = createNewNotes(req.body, notesArray);
+        const note = createNewNotes(req.body, notesArrayFunc.get());
         res.json(note);
     }
+});
+
+router.delete('/notes/:id', (req, res) => {
+    const newNotesArray = deleteNote(req.params.id, notesArrayFunc.get());
+    notesArrayFunc.set(newNotesArray);
+    res.json(notesArrayFunc.get());
 });
 
 module.exports = router;
